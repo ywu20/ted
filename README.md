@@ -2,6 +2,9 @@
 
 ## Launch code
 
+- install the websockets library
+```pip3 install websockets```
+
 - setup the server  
 ```python3 s.py``` 
 
