@@ -1,14 +1,49 @@
-// Create WebSocket connection.
-const socket = new WebSocket("ws://127.0.0.1:5678/");
+window.addEventListener("DOMContentLoaded", () => {
 
-// Connection opened
-socket.addEventListener('open', function (event) {
-    alert("open");
-    socket.send('Hello Server!');
-});
+  const websocket = new WebSocket("ws://localhost:6789/");
 
-// Listen for messages
-socket.addEventListener('message', function (event) {
-    alert("message");
-    console.log('Message from server ', event.data);
+
+  document.querySelector(".minus").addEventListener("click", () => {
+
+    websocket.send(JSON.stringify({ action: "minus" }));
+
+  });
+
+
+  document.querySelector(".plus").addEventListener("click", () => {
+
+    websocket.send(JSON.stringify({ action: "plus" }));
+
+  });
+
+
+  websocket.onmessage = ({ data }) => {
+
+    const event = JSON.parse(data);
+    console.log(data)
+
+    switch (event.type) {
+
+      case "value":
+
+        document.querySelector(".value").textContent = event.value;
+
+        break;
+
+      case "users":
+
+        const users = `${event.count} user${event.count == 1 ? "" : "s"}`;
+
+        document.querySelector(".users").textContent = users;
+
+        break;
+
+      default:
+
+        console.error("unsupported event", event);
+
+    }
+
+  };
+
 });
