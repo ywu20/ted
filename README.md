@@ -1,5 +1,8 @@
 # ted
 
+## Prerequisites
+- Make sure you have Python 3.7+ installed
+
 ## Launch code
 
 - install the websockets library
