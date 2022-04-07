@@ -58,7 +58,6 @@ var draw = function(e) {
 var wipeCanvas = function() {
   ctx.clearRect(0, 0, c.clientWidth, c.clientHeight);
   console.log("wiped");
-  websocket.send("wipe "+"-1,-1");
 }
 
 c.addEventListener('click', send_mouse);
@@ -76,7 +75,7 @@ bToggler.addEventListener('click', function() {
                          ); //switch between rectange and circle
 
 var clearB = document.getElementById("buttonClear"); //wipe button
-clearB.addEventListener('click', wipeCanvas); //doesn't need () because just fxnName
+clearB.addEventListener('click', function(){websocket.send("wipe "+"-1,-1");}); //doesn't need () because just fxnName
 
 websocket.onmessage=({data})=>{
   const event = JSON.parse(data);
