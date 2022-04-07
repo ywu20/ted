@@ -26,6 +26,7 @@ var send_mouse = function(e){
   console.log(mouseX+","+mouseY);
   websocket.send(mode+" "+mouseX+","+mouseY);
 }
+
 var drawRect = function(mouseX, mouseY) {
   //var mouseX = e.offsetX;
   //var mouseY = e.offsetY;
@@ -35,9 +36,7 @@ var drawRect = function(mouseX, mouseY) {
 
 }
 
-var drawCircle = function(e) {
-  var mouseX = e.offsetX;
-  var mouseY = e.offsetY;
+var drawCircle = function(mouseX, mouseY) {
   console.log("mouseClick registered at ", mouseX, mouseY);
   ctx.fillStyle = "red";
   ctx.beginPath();
@@ -59,6 +58,7 @@ var draw = function(e) {
 var wipeCanvas = function() {
   ctx.clearRect(0, 0, c.clientWidth, c.clientHeight);
   console.log("wiped");
+  websocket.send("wipe "+"-1,-1");
 }
 
 c.addEventListener('click', send_mouse);
@@ -83,5 +83,9 @@ websocket.onmessage=({data})=>{
   console.log(event);
   if(event.mode=="rect"){
     drawRect(event.xcor,event.ycor);
+  }else if (event.mode == "circle"){
+    drawCircle(event.xcor, event.ycor);
+  }else if (event.mode == "wipe"){
+    wipeCanvas();
   }
 }
