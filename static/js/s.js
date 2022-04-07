@@ -11,58 +11,44 @@ var ctx = c.getContext("2d");
 var mode = "rect";
 
 var toggleMode = (e) => {
-  console.log("toggling...");
   if (mode == "rect") {
     mode = "circle";
   }
   else {
     mode = "rect";
   }
-  console.log(mode);
+
 }
+
 var send_mouse = function(e){
   var mouseX = e.offsetX;
   var mouseY = e.offsetY;
-  console.log(mouseX+","+mouseY);
+  console.log("sent to server "+mode+" "+mouseX+","+mouseY);
   websocket.send(mode+" "+mouseX+","+mouseY);
 }
 
 var drawRect = function(mouseX, mouseY) {
-  //var mouseX = e.offsetX;
-  //var mouseY = e.offsetY;
-  console.log("mouseClick registered at ", mouseX, mouseY);
   ctx.fillStyle = "red";
   ctx.fillRect(mouseX, mouseY, 100, 200);
 
 }
 
 var drawCircle = function(mouseX, mouseY) {
-  console.log("mouseClick registered at ", mouseX, mouseY);
   ctx.fillStyle = "red";
   ctx.beginPath();
   ctx.arc(mouseX, mouseY, 50, 0, 2*Math.PI);
   ctx.fill();
 }
 
-var draw = function(e) {
-  if (mode == "rect") {
-    drawRect(e);
-  }
-  else {
-    drawCircle(e);
-  }
-  console.log("drew shape");
-}
-
 //var wipeCanvas = () => {}
 var wipeCanvas = function() {
   ctx.clearRect(0, 0, c.clientWidth, c.clientHeight);
-  console.log("wiped");
 }
 
 c.addEventListener('click', send_mouse);
 
-var bToggler = document.getElementById("buttonToggle"); //rect|circ button
+//rect|circ button
+var bToggler = document.getElementById("buttonToggle");
 bToggler.addEventListener('click', function() {
                                     toggleMode();
                                     if (mode == "rect") {
@@ -72,13 +58,16 @@ bToggler.addEventListener('click', function() {
                                       bToggler.innerHTML = "Circle";
                                     }
                                   }
-                         ); //switch between rectange and circle
+                         );
 
 var clearB = document.getElementById("buttonClear"); //wipe button
-clearB.addEventListener('click', function(){websocket.send("wipe "+"-1,-1");}); //doesn't need () because just fxnName
+clearB.addEventListener('click', function(){
+    console.log("sent to server wipe -1,-1");
+    websocket.send("wipe "+"-1,-1");}); //doesn't need () because just fxnName
 
 websocket.onmessage=({data})=>{
   const event = JSON.parse(data);
+  console.log("recieved from server:");
   console.log(event);
   if(event.mode=="rect"){
     drawRect(event.xcor,event.ycor);
@@ -86,5 +75,7 @@ websocket.onmessage=({data})=>{
     drawCircle(event.xcor, event.ycor);
   }else if (event.mode == "wipe"){
     wipeCanvas();
+  }else if(event.type == "users"){
+    console.log(event.count+" users are online");
   }
 }
