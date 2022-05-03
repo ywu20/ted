@@ -4,10 +4,8 @@ var c = document.getElementById("slate");
 // creates websocket
 const websocket = new WebSocket("ws://localhost:6789/");
 
-//instatiate a CanvasRenderingContext2D object
 var ctx = c.getContext("2d");
 
-//init global state var
 var mode = "rect";
 
 var toggleMode = (e) => {
@@ -20,11 +18,12 @@ var toggleMode = (e) => {
 
 }
 
+// sending data to server
 var send_mouse = function(e){
   var mouseX = e.offsetX;
   var mouseY = e.offsetY;
   console.log("sent to server "+mode+" "+mouseX+","+mouseY);
-  websocket.send(mode+" "+mouseX+","+mouseY);
+  websocket.send(JSON.stringify({"mode":mode, "xcor":mouseX, "ycor":mouseY}))
 }
 
 var drawRect = function(mouseX, mouseY) {
@@ -40,14 +39,13 @@ var drawCircle = function(mouseX, mouseY) {
   ctx.fill();
 }
 
-//var wipeCanvas = () => {}
 var wipeCanvas = function() {
   ctx.clearRect(0, 0, c.clientWidth, c.clientHeight);
 }
 
+// the click button would send coordinates to all instead of drawing
 c.addEventListener('click', send_mouse);
 
-//rect|circ button
 var bToggler = document.getElementById("buttonToggle");
 bToggler.addEventListener('click', function() {
                                     toggleMode();
@@ -60,15 +58,22 @@ bToggler.addEventListener('click', function() {
                                   }
                          );
 
-var clearB = document.getElementById("buttonClear"); //wipe button
+var clearB = document.getElementById("buttonClear");
 clearB.addEventListener('click', function(){
-    console.log("sent to server wipe -1,-1");
-    websocket.send("wipe "+"-1,-1");}); //doesn't need () because just fxnName
 
+    // send to  server to wipe for all
+    console.log("sent to server wipe -1,-1");
+    websocket.send(JSON.stringify({"mode":"wipe"}));})
+
+// gets data from server to see where / what to draw
 websocket.onmessage=({data})=>{
+  // parse data from server
   const event = JSON.parse(data);
+
   console.log("recieved from server:");
   console.log(event);
+
+  // determine what/ where to draw
   if(event.mode=="rect"){
     drawRect(event.xcor,event.ycor);
   }else if (event.mode == "circle"){

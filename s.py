@@ -4,16 +4,13 @@ import websockets
 
 USERS = []
 
+# returns how many users are logged in
 def users_event():
     return json.dumps({"type": "users", "count": len(USERS)})
 
-
+# parse data from clients about where to draw rects and circles
 def value_event(message):
-    message = message.split(" ")
-    coor = message[1]
-    coor = coor.split(",")
-    print("server received mode: " +message[0] +". mouse click at: "+ coor[0]+","+coor[1])
-    return json.dumps({"mode":message[0] , "xcor": coor[0], "ycor" : coor[1]})
+    return message
 
 async def send_data(websocket):
     try:
@@ -37,7 +34,7 @@ async def send_data(websocket):
 async def main():
     # server at localhost 6789
     async with websockets.serve(send_data, "localhost", 6789):
-        await asyncio.Future()  # run forever
+        await asyncio.Future() # run forever
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-app = Flask(__name__) # Q0: Where have you seen similar syntax in other langs?
+app = Flask(__name__)
 
 @app.route("/")
 def boo():
