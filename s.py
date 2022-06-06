@@ -11,6 +11,10 @@ socketio = SocketIO(app, logger=True)
 def boo():
     return render_template('hello.html')
 
+@socketio.event
+def my_ping():
+    emit('my_pong')
+
 @socketio.on('send_mouse')
 def message_recieved(data):
     # print(data['text'])
