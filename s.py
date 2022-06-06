@@ -1,41 +1,22 @@
-import asyncio
 import json
-import websockets
+from flask import *
+from flask_socketio import *
 
 USERS = []
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'some super secret key!'
+socketio = SocketIO(app, logger=True)
 
-# returns how many users are logged in
-def users_event():
-    return json.dumps({"type": "users", "count": len(USERS)})
+@app.route("/")
+def boo():
+    return render_template('hello.html')
 
-# parse data from clients about where to draw rects and circles
-def value_event(message):
-    return message
-
-async def send_data(websocket):
-    try:
-        # Register user
-        USERS.append(websocket)
-        print("New user entered!")
-        # Tell all the clients about the new user.
-        websockets.broadcast(USERS, users_event())
-
-        # Tell clients about somebody clicking on canvas.
-        async for message in websocket:
-            websockets.broadcast(USERS, value_event(message))
-
-    finally:
-        # Unregister user
-        USERS.remove(websocket)
-        print("Some user exited.")
-        websockets.broadcast(USERS, users_event())
-
-
-async def main():
-    # server at localhost 6789
-    async with websockets.serve(send_data, "localhost", 6789):
-        await asyncio.Future() # run forever
+@socketio.on('send_mouse')
+def message_recieved(data):
+    # print(data['text'])
+    emit('draw_to_all', data, broadcast=True)
+    # emit('message_from_server', {'text':'Message recieved!'})
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    socketio.run(app, port=8000, debug=True)
