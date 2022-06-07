@@ -94,7 +94,7 @@
   clearB.addEventListener('click', function(){
       // send to  server to wipe for all
       // websocket.send(JSON.stringify({"mode":"wipe"}));
-      socket.emit('send_mouse', {"mode":wipe});
+      socket.emit('send_mouse', {"mode":"wipe"});
       console.log("sent to server wipe -1,-1");
   });
 
